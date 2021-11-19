@@ -1,0 +1,3 @@
+[submodule "Lenia/vendor/glfw"]
+	path = Lenia/vendor/glfw
+	url = https://github.com/glfw/glfw.git
