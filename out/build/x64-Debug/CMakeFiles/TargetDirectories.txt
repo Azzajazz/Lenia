@@ -1,6 +1,0 @@
-D:/Dev/C++/Lenia/out/build/x64-Debug/CMakeFiles/testing.dir
-D:/Dev/C++/Lenia/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-D:/Dev/C++/Lenia/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
-D:/Dev/C++/Lenia/out/build/x64-Debug/vendor/glad/CMakeFiles/glad.dir
-D:/Dev/C++/Lenia/out/build/x64-Debug/vendor/glad/CMakeFiles/edit_cache.dir
-D:/Dev/C++/Lenia/out/build/x64-Debug/vendor/glad/CMakeFiles/rebuild_cache.dir
