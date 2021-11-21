@@ -1,0 +1,6 @@
+# Ignore any VS config files
+.vs
+
+#Ignore build files
+out
+x64
