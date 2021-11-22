@@ -29,7 +29,7 @@ namespace Lenia
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
-		s_window = glfwCreateWindow(800, 600, "Hello, World!", NULL, NULL);
+		s_window = glfwCreateWindow(800, 800, "Hello, World!", NULL, NULL);
 		if (s_window == nullptr)
 		{
 			std::cerr << "[X]Failed to create glfw window\n";
@@ -41,10 +41,24 @@ namespace Lenia
 		LENIA_ASSERT(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "Failed to retrieve GL loader");
 		LENIA_ASSERT(gladLoadGL(), "Failed to load GL functions");
 
-		glViewport(0, 0, 800, 600);
+		glViewport(0, 0, 800, 800);
 
 		Renderer::init();
-		Renderer::setDrawInfo();
+
+		uint32_t grid[10 * 10] = {
+			0, 1, 0, 0, 0, 1, 1, 1, 0, 1,
+			0, 1, 1, 1, 0, 1, 0, 1, 0, 1,
+			0, 1, 0, 0, 0, 1, 1, 1, 1, 1,
+			0, 1, 0, 0, 1, 0, 0, 0, 0, 1,
+			1, 0, 0, 1, 0, 1, 1, 1, 0, 1,
+			0, 1, 0, 0, 0, 1, 1, 1, 0, 1,
+			0, 1, 0, 1, 0, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 0, 1, 0, 1, 0, 1,
+			0, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+			1, 0, 0, 1, 1, 0, 1, 1, 0, 1
+		};
+
+		Renderer::setDrawInfo(grid, 10, 10);
 	}
 
 	void Simulation::run()

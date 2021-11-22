@@ -18,27 +18,28 @@ namespace Lenia
 		// Shader source code
 		const char* vertexSrc = R"(
 			#version 430 core
-			layout (location = 0) in vec3 lPos;
-			layout (location = 1) in vec3 lColour;
 
-			out vec3 aColour;
+			layout (location = 0) in vec3 inPos;
+			layout (location = 1) in float inColour;
+
+			out float aColour;
 
 			void main()
 			{
-				gl_Position = vec4(lPos, 1.0);
-				aColour = lColour;
+				gl_Position = vec4(inPos, 1.0);
+				aColour = inColour;
 			}
 		)";
 
 		const char* fragmentSrc = R"(
 			#version 430 core
 			
-			in vec3 aColour;
-			out vec4 fColour;
+			in float aColour;
+			out vec4 outColour;
 
 			void main()
 			{
-				fColour = vec4(aColour, 1.0);
+				outColour = vec4(aColour, aColour, aColour, 1.0);
 			}
 		)";
 
@@ -84,18 +85,57 @@ namespace Lenia
 		glDeleteShader(fragmentShader);
 	}
 
-	void Renderer::setDrawInfo()
+	void Renderer::setDrawInfo(uint32_t* grid, uint32_t width, uint32_t height)
 	{
-		float vertices[6 * 3] = {
-			-0.5f, -0.5f, 0.0f, 0.2f, 0.0f, 0.1f,
-			0.0f, 0.5f, 0.0f, 0.2f, 0.0f, 0.1f,
-			0.5f, -0.5f, 0.0f, 0.2f, 0.0f, 0.1f
-		};
+		// Bind vertex array
+		glBindVertexArray(s_rendererData.VAO);
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
+		// Set number of elements and vertices for future use
+		s_rendererData.elementCount = width * height * 6;
+		s_rendererData.vertexCount = width * height * 4;
+
+		// Initialise buffer sizes
+		glBufferData(GL_ARRAY_BUFFER, s_rendererData.vertexCount * 4 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, s_rendererData.elementCount * sizeof(uint32_t), nullptr, GL_DYNAMIC_DRAW);
+
+		// Input quad data
+		for (uint32_t j = 0; j < height; j++)
+		{
+			for (uint32_t i = 0; i < width; i++)
+			{
+				float topLeftCoords[3] = {
+					2 * (float)i / (float)width - 1, 2 * (float)(height - j) / (float)width - 1, 0.0f
+				};
+				float topRightCoords[3] = {
+					2 * (float)(i + 1) / (float)width - 1, 2 * (float)(height - j) / (float)width - 1, 0.0f
+				};
+				float bottomRightCoords[3] = {
+					2 * (float)(i + 1) / (float)width - 1, 2 * (float)(height - j - 1) / (float)width - 1, 0.0f
+				};
+				float bottomLeftCoords[3] = {
+					2 * (float)i / (float)width - 1, 2 * (float)(height - j - 1) / (float)width - 1, 0.0f
+				};
+				float vertices[4 * 4] = {
+					topLeftCoords[0], topLeftCoords[1], topLeftCoords[2], (float)grid[j * width + i],
+					topRightCoords[0], topRightCoords[1], topRightCoords[2], (float)grid[j * width + i],
+					bottomRightCoords[0], bottomRightCoords[1], bottomRightCoords[2], (float)grid[j * width + i],
+					bottomLeftCoords[0], bottomLeftCoords[1], bottomLeftCoords[2], (float)grid[j * width + i],
+				};
+
+				uint32_t indices[6] = {
+					(j * width + i) * 4, (j * width + i) * 4 + 1, (j * width + i) * 4 + 2,
+					(j * width + i) * 4 + 2, (j * width + i) * 4 + 3, (j * width + i) * 4
+				};
+
+				glBufferSubData(GL_ARRAY_BUFFER, (j * width + i) * sizeof(vertices), sizeof(vertices), vertices);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, (j * width + i) * sizeof(indices), sizeof(indices), indices);
+			}
+		}
+
+		// Specify layout
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+		glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 	}
 
@@ -103,7 +143,7 @@ namespace Lenia
 	{
 		glUseProgram(s_rendererData.shaderProgram);
 		glBindVertexArray(s_rendererData.VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, s_rendererData.elementCount, GL_UNSIGNED_INT, 0);
 	}
 
 	struct RendererData Renderer::s_rendererData = { 0 };
