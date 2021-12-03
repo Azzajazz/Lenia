@@ -4,20 +4,17 @@
 #include "Simulation.h"
 #include "Logging.h"
 #include "Renderer.h"
+#include <vector>
+#include <chrono>
+#include <thread>
 
 namespace Lenia
 {
+	constexpr double TICKRATE = 7.0;
+
 	void errorCallback(int code, const char* message)
 	{
 		LENIA_INFO(message);
-	}
-
-	Simulation::Simulation()
-	{
-	}
-
-	Simulation::~Simulation()
-	{
 	}
 
 	void Simulation::init()
@@ -45,28 +42,44 @@ namespace Lenia
 
 		Renderer::init();
 
-		uint32_t grid[10 * 10] = {
-			0, 1, 0, 0, 0, 1, 1, 1, 0, 1,
-			0, 1, 1, 1, 0, 1, 0, 1, 0, 1,
-			0, 1, 0, 0, 0, 1, 1, 1, 1, 1,
-			0, 1, 0, 0, 1, 0, 0, 0, 0, 1,
-			1, 0, 0, 1, 0, 1, 1, 1, 0, 1,
-			0, 1, 0, 0, 0, 1, 1, 1, 0, 1,
-			0, 1, 0, 1, 0, 1, 1, 1, 1, 1,
-			1, 1, 1, 1, 0, 1, 0, 1, 0, 1,
-			0, 1, 0, 0, 0, 1, 0, 0, 0, 1,
-			1, 0, 0, 1, 1, 0, 1, 1, 0, 1
+		std::vector<uint32_t> grid = {
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		};
 
-		Renderer::setDrawInfo(grid, 10, 10);
+		s_golLogic = new GoL(grid, 18, 18);
 	}
 
 	void Simulation::run()
 	{
+		double startTime = glfwGetTime();
 		while (!glfwWindowShouldClose(s_window))
 		{
-			glfwSwapBuffers(s_window);
+			double updateTime = glfwGetTime();
+			if (updateTime - startTime > 1 / TICKRATE)
+			{
+				s_golLogic->updateGrid();
+				startTime = glfwGetTime();
+			}
+			Renderer::setDrawInfo(*s_golLogic->getGrid(), s_golLogic->getWidth(), s_golLogic->getHeight());
 			Renderer::draw();
+			glfwSwapBuffers(s_window);
 			glfwPollEvents();
 		}
 
@@ -74,4 +87,5 @@ namespace Lenia
 	}
 	
 	GLFWwindow* Simulation::s_window = nullptr;
+	GoL* Simulation::s_golLogic = nullptr;
 }

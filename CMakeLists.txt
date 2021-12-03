@@ -19,6 +19,7 @@ add_executable(
 	Lenia/Simulation.cpp
 	Lenia/Main.cpp
 	Lenia/Renderer.cpp
+	Lenia/GameOfLife.cpp
 )
 
 target_link_libraries(

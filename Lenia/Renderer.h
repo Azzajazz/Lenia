@@ -18,7 +18,7 @@ namespace Lenia
 	{
 	public:
 		static void init();
-		static void setDrawInfo(uint32_t* grid, uint32_t width, uint32_t height);
+		static void setDrawInfo(const std::vector<uint32_t>& grid, uint32_t width, uint32_t height);
 		static void draw();
 	private:
 		static struct RendererData s_rendererData;

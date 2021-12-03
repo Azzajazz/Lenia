@@ -85,7 +85,7 @@ namespace Lenia
 		glDeleteShader(fragmentShader);
 	}
 
-	void Renderer::setDrawInfo(uint32_t* grid, uint32_t width, uint32_t height)
+	void Renderer::setDrawInfo(const std::vector<uint32_t>& grid, uint32_t width, uint32_t height)
 	{
 		// Bind vertex array
 		glBindVertexArray(s_rendererData.VAO);
