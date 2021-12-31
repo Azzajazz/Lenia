@@ -77,7 +77,7 @@ namespace Lenia
 				s_golLogic->updateGrid();
 				startTime = glfwGetTime();
 			}
-			Renderer::setDrawInfo(*s_golLogic->getGrid(), s_golLogic->getWidth(), s_golLogic->getHeight());
+			Renderer::setDrawInfo(s_golLogic->getGrid(), s_golLogic->getWidth(), s_golLogic->getHeight());
 			Renderer::draw();
 			glfwSwapBuffers(s_window);
 			glfwPollEvents();
